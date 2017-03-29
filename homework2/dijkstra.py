@@ -18,9 +18,12 @@ def dijkstra(v_s,v_g,graph):
 		P.remove(v_i)
 		v_i = numpy.array([float("inf"),'C',numpy.array([])])
 		for j in range (0,len(V)-1):
-			if 
+			if  && V[j][]
 				if v_i[0]+avg_cost(v_i,V[j]) < V[j][0]:
-					 
+					V[j][0] = v_i[0] + avg_cost(v_i,V[j])
+					V[j][2] = v_i
+					V[j][1] = 'V'
+					P.append(V[j])
 
 
 def avg_cost(v_i,v_j):
