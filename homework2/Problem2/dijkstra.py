@@ -14,6 +14,9 @@ class dijkstra:
         end = (2,2)
         path =  self.dijkstra(start,end,self._grid)
         last = path[end]
+        last2 = last._parent._parent
+        print last._parent._treat
+        print len(path)
         print last._cost
         print self.makePath(path,start,end)
 
@@ -27,7 +30,7 @@ class dijkstra:
             nodes.append(float(element[2]))
         N = len(nodes)
         grid = np.reshape(nodes, (np.sqrt(N),np.sqrt(N)))
-        print grid
+        print  grid
         return grid
 
     def dijkstra(self, start, end,grid ):
@@ -79,12 +82,14 @@ class dijkstra:
 
     def makePath(self, nodes, start, end):
         path = []
-        current = end
-        path.append(current._loc)
-        while current != start:
+        current =  nodes[end]
+        path.append(current._treat)
+        while current._loc != start:
             parent = current._parent
-            path.append(parent)
+            print current
+            path.append(parent._treat)
             current = parent
+
         return path
 
 
