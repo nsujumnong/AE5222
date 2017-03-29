@@ -1,4 +1,12 @@
+def getNeighbours(loc):
+    neighbours = []
+    neighbours.append ( (loc[0]+1,loc[1]) )
+    neighbours.append ( (loc[0],loc[1]+1) )
+    neighbours.append ( (loc[0]-1,loc[1]) )
+    neighbours.append ( (loc[0],loc[1]-1) )
+    return neighbours
+
+loc = (0,2)
 
 
-dict = {(2,1): 'First',(1,2): 'Zara', 'Age': 7}
-print "dict['Name']: ", dict[(1,2)]
+print getNeighbours(loc)

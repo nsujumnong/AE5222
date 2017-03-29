@@ -7,27 +7,44 @@ class dijkstra:
     """docstring for ."""
     def __init__(self, grid):
 
-        self._grid = grid
-        points = self.makeList(self._grid)
-        self.makeNode(points)
+        self._grid = self.makeList(grid)
 
-    def makeList(self,grid):
+
+    def makeList(grid):
+        nodes = []
         with open(grid, 'rb') as f:
             reader = csv.reader(f)
             your_list = map(tuple,reader)
-        new_list =  map(list,map(None,*your_list))
-        #print new_list
-        return new_list
-        pass
+        grid =  map(list,map(None,*your_list))
+        for element in grid:
+            nodes.append(float(element[2]))
+        N = len(nodes)
+        return np.flipud(np.reshape(nodes, (np.sqrt(N),np.sqrt(N))))
+
+    def dijkstra(self, start, end ):
+
+        current = start
+        
+        while current != end:
+
+            neighbours = getNeighbours(node._loc)
+
+            node =
+
+            pass
+
+    def getNeighbours(loc):
+        neighbours = []
+        neighbours.append ( (loc[0]+1,loc[1]) )
+        neighbours.append ( (loc[0],loc[1]+1) )
+        neighbours.append ( (loc[0]-1,loc[1]) )
+        neighbours.append ( (loc[0],loc[1]-1) )
+        return neighbours
+
+
 
     def makeNode(self,grid):
-        nodes = []
-        for element in grid:
-            temp = Node.Node( [ float(element[0]),float(element[1])], 0, float(element[2])  )
-            nodes.append(temp)
-        print nodes[1]._loc
-        print nodes[1]._treat
-
+        pass
 
 
 
