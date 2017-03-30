@@ -9,7 +9,7 @@ class dijkstra:
     def __init__(self, start, end, grid):
 
         ( self._grid, size) = self.makeList(grid)
-        print size
+        #print size
 
         self._size = size - 1
         self._start = start
@@ -31,7 +31,7 @@ class dijkstra:
         for element in grid:
             nodes.append(float(element[2]))
         N = len(nodes)
-        print N
+        #print N
         grid = np.reshape(nodes, (np.sqrt(N),np.sqrt(N)))
         #print  grid
         return ( grid, np.sqrt(N))
@@ -131,6 +131,16 @@ class dijkstra:
         return path
 
 
+
+print "N = 2"
+start = (0,0)
+end = (2,2)
+dijkstra(start, end,'data3.csv')
+print "N = 15"
+start = (0,0)
+end = (14,14)
+dijkstra(start, end,'data15.csv')
+print "N = 101"
 start = (0,0)
 end = (100,100)
 dijkstra(start, end,'data101.csv')
