@@ -7,3 +7,4 @@ class Node:
         self._parent = parent
         self._treat = treat
         self._cost = float("inf")
+        self._visted = 0

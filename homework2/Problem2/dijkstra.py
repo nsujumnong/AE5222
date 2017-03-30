@@ -10,14 +10,18 @@ class dijkstra:
 
         ( self._grid, size) = self.makeList(grid)
         print size
+
         self._size = size - 1
-        path =  self.dijkstra(start,end,self._grid)
+        self._start = start
+        self._end =end
+        path =  self.dijkstra()
+        print path
         last = path[end]
         last2 = last._parent._parent
         print last._parent._treat
         print len(path)
         print last._cost
-        print self.makePath(path,start,end)
+        print self.makePath(path)
 
     '''forms the drive in C sytle 2D matrix '''
     def makeList(self,grid):
@@ -29,45 +33,77 @@ class dijkstra:
         for element in grid:
             nodes.append(float(element[2]))
         N = len(nodes)
+        print N
         grid = np.reshape(nodes, (np.sqrt(N),np.sqrt(N)))
         print  grid
         return ( grid, np.sqrt(N))
 
     '''does the actualy dijkstra'''
-    def dijkstra(self, start, end,grid ):
+    def dijkstra(self  ):
 
 
         to_viste =  Q.PriorityQueue() # PriorityQueue for nodes to viste
-        node = Node.Node(start, [],0 ) # create vist node
+        node = Node.Node(self._start, [],0 ) # create vist node
         node._cost = 0
         to_viste.put((0,node))
         visted = {}
         current = to_viste.get()[1]
+        visted.update({current._loc : current})
         print current
-        # keep going until it reachs the end
-        while current._loc != end:
-
+        # keep going until it reachs the self._end
+        while current._loc != self._end :
+            #raw_input("step")
             # lowest cost node
             dist = current._cost # cost to get to that node
             neighbours = self.getNeighbours(current._loc) # get neighbours
+            #print neighbours
             for loc in neighbours:
+
+                #print "here:", current
                 if self.legal(loc): # in grid
-                    treat = grid[loc[0],loc[1]] # get the treat at that node
-                    if loc in visted.values(): # if we have visted
+                    treat = self._grid[loc[0],loc[1]] # get the treat at that node
+                    if loc in visted: # if we have visted
+                        #print "neighbor was visited "
+                        #print visted
                         if visted[loc]._cost > dist + 0.5* (current._treat  + treat): # compare treats
-                            visted[loc]._cost = dist + 0.5* (current._treat  + treat)
+                            new_cost=visted[loc]._cost = dist + 0.5* (current._treat  + treat)
+                            #print "new_cost:", new_cost
+                            visted[loc]._cost = new_cost
                             visted[loc]._parent = current
                     else: # if not in the queue add it
+                        #print "never been here before"
                         temp = Node.Node(loc,current,treat)
-                        temp._cost = dist + 0.5* (current._treat  + treat)
+                        temp._cost = dist + 0.5* (current._treat  + treat)#visted[loc]._cos
                         to_viste.put((temp._cost,temp ))
             # get next node
-            current = to_viste.get()[1]
-            # add to visted list
+            #print "beifore, ", to_viste.qsize()
+            print "before ",current._loc
+            print "before ",current
+
+            current._visted = 1
             visted.update({current._loc : current})
-        visted[end]._cost = visted[end]._cost + 0.5*visted[end]._treat
+            current = to_viste.get()[1]
+
+            #print current
+            #nt self.getLoc(visted.values())
+            while current._loc in self.getLoc(visted.values()):
+                #print "hello"
+                current = to_viste.get()[1]
+
+            #print "after, ", to_viste.qsize()
+            # add to visted list
+
+            #print(visted)
+            print "after ",current._loc
+            print "after ",current
+        visted.update({current._loc : current})
+        visted[self._end]._cost = visted[self._end]._cost + 0.5*visted[self._end]._treat
         return (visted)
 
+    def getLoc(self,nodes):
+        x =  [ _._loc for _ in nodes]
+
+        return x
     '''get the nodes'''
     def getNeighbours(self,loc):
         # Yes I know this is ugly
@@ -84,11 +120,11 @@ class dijkstra:
 
 
     '''forms the path based on the node'''
-    def makePath(self, nodes, start, end):
+    def makePath(self, nodes):
         path = []
-        current =  nodes[end]
+        current =  nodes[self._end]
         path.append(current._treat)
-        while current._loc != start:
+        while current._loc != self._start:
             parent = current._parent
             print current
             path.append(parent._treat)
@@ -98,5 +134,5 @@ class dijkstra:
 
 
 start = (0,0)
-end = (2,2)
-dijkstra(start, end,'data.csv')
+end = (14,14)
+dijkstra(start, end,'data15.csv')
