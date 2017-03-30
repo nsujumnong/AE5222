@@ -1,12 +1,9 @@
-def getNeighbours(loc):
-    neighbours = []
-    neighbours.append ( (loc[0]+1,loc[1]) )
-    neighbours.append ( (loc[0],loc[1]+1) )
-    neighbours.append ( (loc[0]-1,loc[1]) )
-    neighbours.append ( (loc[0],loc[1]-1) )
-    return neighbours
+import Node
+try:
+    import Queue as Q  # ver. < 3.0
+except ImportError:
+    import queue as Q
 
-loc = (0,2)
+x = [ (1,2),(2,2)]
 
-
-print getNeighbours(loc)
+print (1,2) in x

@@ -15,13 +15,11 @@ class dijkstra:
         self._start = start
         self._end =end
         path =  self.dijkstra()
-        print path
         last = path[end]
-        last2 = last._parent._parent
-        print last._parent._treat
-        print len(path)
+        #print last._parent._treat
+        #print len(path)
         print last._cost
-        print self.makePath(path)
+        #print self.makePath(path)
 
     '''forms the drive in C sytle 2D matrix '''
     def makeList(self,grid):
@@ -35,7 +33,7 @@ class dijkstra:
         N = len(nodes)
         print N
         grid = np.reshape(nodes, (np.sqrt(N),np.sqrt(N)))
-        print  grid
+        #print  grid
         return ( grid, np.sqrt(N))
 
     '''does the actualy dijkstra'''
@@ -49,7 +47,7 @@ class dijkstra:
         visted = {}
         current = to_viste.get()[1]
         visted.update({current._loc : current})
-        print current
+        #print current
         # keep going until it reachs the self._end
         while current._loc != self._end :
             #raw_input("step")
@@ -77,8 +75,8 @@ class dijkstra:
                         to_viste.put((temp._cost,temp ))
             # get next node
             #print "beifore, ", to_viste.qsize()
-            print "before ",current._loc
-            print "before ",current
+            #print "before ",current._loc
+            #print "before ",current
 
             current._visted = 1
             visted.update({current._loc : current})
@@ -94,8 +92,8 @@ class dijkstra:
             # add to visted list
 
             #print(visted)
-            print "after ",current._loc
-            print "after ",current
+            #print "after ",current._loc
+            #print "after ",current
         visted.update({current._loc : current})
         visted[self._end]._cost = visted[self._end]._cost + 0.5*visted[self._end]._treat
         return (visted)
@@ -126,7 +124,7 @@ class dijkstra:
         path.append(current._treat)
         while current._loc != self._start:
             parent = current._parent
-            print current
+            #print current
             path.append(parent._treat)
             current = parent
 
@@ -134,5 +132,5 @@ class dijkstra:
 
 
 start = (0,0)
-end = (14,14)
-dijkstra(start, end,'data15.csv')
+end = (100,100)
+dijkstra(start, end,'data101.csv')
