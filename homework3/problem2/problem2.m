@@ -1,6 +1,6 @@
 clear all
 clc
-options = odeset('Events',@stop);  
+options = odeset('Events',@stop2);  
 final = []
 count = 0
 t= []
