@@ -51,6 +51,23 @@ final =
 
 %}
 
+%% plot the threat field
+%load the threat field
+load('threatvaluetrue.mat');
+%reshape it to 125x125
+threat_field2=zeros(125,125);
+for i = 1:125 
+    for j = 1:125
+        threat_field2(i,j)=threat_value_true(j+125*(i-1));
+    end
+end
+x1=-1:1/62.5:1-1/62.5;
+x2=-1:1/62.5:1-1/62.5;
+contourf(x1,x2,threat_field2)
+xlabel('x'),ylabel('y')
+title('Threat field: Problem 1')
+hold on
+
 %% compute the path
 final_sub = [];
 y0_sub = [-1 -1 0.7144];
@@ -61,6 +78,12 @@ tspan = [0 28];
 % plot the path
 x_final = y_sub(:,1);
 y_final = y_sub(:,2);
-plot(x_final,y_final)
+plot(x_final,y_final,'r')
+%plot the heading angles
+figure
+plot(t_sub,y_sub(:,3))
+xlabel('time')
+ylabel('heading angles \psi (rad)')
+title('plotting of \psi')
 
 

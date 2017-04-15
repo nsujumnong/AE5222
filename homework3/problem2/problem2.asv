@@ -32,12 +32,10 @@ for i = 1:125
         threat_field2(i,j)=threat_value_true(j+125*(i-1));
     end
 end
-x1=-1:1/62.5:1-1/62.5;
-x2=-1:1/62.5:1-1/62.5;
-contourf(x1,x2,threat_field2)
-xlabel('x'),ylabel('y')
-title('Threat field: Problem2')
-hold on
+x1=-1:1/1:124/125;
+x2=-1:1/125:124/125;
+contour(x1,x2,threat_field2)
+
 %%
 %     Final
 %     [32.6968    0.6902    0.9192    0.2096    0.6570
@@ -59,12 +57,7 @@ tspan2 = [0  29.5]
 % plot the path
 x2_final = y2_sub(:,1);
 y2_final = y2_sub(:,2);
-plot(x2_final,y2_final,'r')
-% plot heading angles
-figure
-plot(t2_sub,y2_sub(:,3))
-xlabel('time')
-ylabel('heading angles \psi (rad)')
-title('plotting of \psi')
+plot(x2_final,y2_final)
+
 
 
