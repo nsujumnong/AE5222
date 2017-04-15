@@ -8,8 +8,6 @@ y = []
 te= []
 ye = []
 ie = []
-
-%%
 for ii=0:.00001:0.5*pi
     
     y0 = [ -1 -1 ii]
@@ -55,12 +53,8 @@ final =
 final_sub = [];
 y0_sub = [-1 -1 0.7144];
 tspan = [0 28];
-[t_sub,y_sub,te_sub,ye_sub,ie_sub] = ode45(@EQ,tspan,y0_sub,options);
+[t_sub,y_sub,te_sub,ye_sub,ie_sub] = ode45(@EG,tspan,y0_sub,options);
 
-%%
-% plot the path
-x_final = y_sub(:,1);
-y_final = y_sub(:,2);
-plot(x_final,y_final)
+% 
 
 
