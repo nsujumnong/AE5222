@@ -89,7 +89,7 @@ x_6_ps0 = linspace(0,0,16);
 u_1_ps0 = linspace(30,30,16);
 u_2_ps0 = linspace(0,0,16);
 u_3_ps0 = linspace(0,0,16);
-init_gs_tf = linspace(10,100,16);
+init_gs_tf = linspace(0,100,16);
 ps_opt_var0 = [x_1_ps0'; x_2_ps0'; x_3_ps0';...
 	x_4_ps0'; x_5_ps0'; x_6_ps0'; u_1_ps0'; u_2_ps0'; u_3_ps0'; init_gs_tf'];
 
@@ -104,9 +104,9 @@ n_max_fun_evals = 1e6;
 n_max_iter      = 1e4;
 
 %----- State and input bounds
-lower_bounds	= -inf*ones( 9*(ps_N + 1) + 1, 1);	%=== INCOMPLETE
-upper_bounds	= inf*ones( 9*(ps_N + 1) + 1, 1);	%=== INCOMPLETE
-
+lower_bounds	= -inf*ones( 9*(ps_N + 1) + 1, 1)	%=== INCOMPLETE
+upper_bounds	=  inf*ones( 9*(ps_N + 1) + 1, 1);	%=== INCOMPLETE
+size(lower_bounds)
 
 %----- MATLAB R2016a or higher
 solver_options	= optimoptions('fmincon', 'Display','final', 'Algorithm','sqp',...
@@ -154,7 +154,7 @@ try_again = any(exit_flag == [2 3 4 5]);
 n_attempts=	1;
 while try_again && (n_attempts <= 7)
 	ps_opt_var0 = ps_opt_var_calc;
-	for m1 = 1:9
+	for m1 = 1:9    
 		ps_opt_var0( ((ps_N + 1)*(m1 - 1) + 2):((ps_N + 1)*m1 - 1) ) = ...
 			ps_opt_var0( ((ps_N + 1)*(m1 - 1) + 2):((ps_N + 1)*m1 - 1) ) + ...
 			0.2*randn(ps_N - 1, 1);
@@ -239,7 +239,7 @@ results_1hop.tf_ps	= ps_opt_tf;
 		m01 = 9; u_ps_3	= ps_opt_var(((ps_N + 1)*(m01 - 1) + 1):((ps_N + 1)*m01));
 
 		tf_ps	= ps_opt_var((ps_N + 1)*9 + 1);
-       %*quadrotor_model_parameters.scale_posn
+       %
 		us76	= std_atmosphere(-x_ps_3 );
         
         D = 0.5*us76.rho'*x_ps_4.^2*S*Cd;
@@ -274,9 +274,14 @@ results_1hop.tf_ps	= ps_opt_tf;
         c8 =  u_ps_3-deg2rad(30);
         c9 = sqrt( u_ps_1.^2 + u_ps_2.^2) - Fmax; 
         c10 = u_ps_1 - Emax;
-        c11 = .01 - tf_ps; 
+        c11 = .1 - tf_ps;
+        c12 = .1 - x_ps_1;
+        c13 = .1 - x_ps_2;
+       x_ps_1
+        
+         
 		
-		c_inequality= [c1;c2;c3;c4;c5;c6;c7;c8;c9;c10;c11];	%=== INCOMPLETE
+		c_inequality= [c1;c2;c3;c4;c5;c6;c7;c8;c9;c10;c11;c12;c13];	%=== INCOMPLETE
 		c_equality	= [A1;A2;A3;A4;A5;A6]	;	%==== INCOMPLETE
 		
 		if any(~isreal(c_equality)) || any(~isreal(c_inequality))
