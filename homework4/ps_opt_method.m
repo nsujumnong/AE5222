@@ -86,7 +86,7 @@ x_6_ps0 = linspace(deg2rad(-10),deg2rad(10),16);
 u_1_ps0 = linspace(-400,400,16);
 u_2_ps0 = linspace(-400,400,16);
 u_3_ps0 = linspace(deg2rad(-30),deg2rad(30),16);
-init_gs_tf = linspace(0,100,16);
+init_gs_tf = linspace(10,100,16);
 ps_opt_var0 = [x_1_ps0'; x_2_ps0'; x_3_ps0';...
 	x_4_ps0'; x_5_ps0'; x_6_ps0'; u_1_ps0'; u_2_ps0'; u_3_ps0'; init_gs_tf'];
 
@@ -199,19 +199,20 @@ results_1hop.tf_ps	= ps_opt_tf;
 		m01 = 8; u_ps_2	= ps_opt_var(((ps_N + 1)*(m01 - 1) + 1):((ps_N + 1)*m01));
 % 		m01 = 9; u_ps_3	= ps_opt_var(((ps_N + 1)*(m01 - 1) + 1):((ps_N + 1)*m01));
 		
-		tf_ps	= ps_opt_var((ps_N + 1)*9 + 1);
+		tf_ps	= ps_opt_var((ps_N + 1)*9 + 1)
         
-        cost = 0.01*tf_ps + 0.5*tf_ps*x_ps_4.*sqrt(u_ps_1.^2 + u_ps_1.^2)'*w_ps
+        cost = 0.01*tf_ps + 0.5*tf_ps*calc_energy_1hop(ps_opt_var)'*w_ps
 % % % 		INCOMPLETE
 		
 	end
 
 	%======================== ENERGY FUNCTION =============================
 	function cost = calc_energy_1hop(ps_opt_var)
-		m01 = 4; x_ps_4	= ps_opt_var(((ps_N + 1)*(m01 - 1) + 1):((ps_N + 1)*m01));
+		m01 = 4; V	= ps_opt_var(((ps_N + 1)*(m01 - 1) + 1):((ps_N + 1)*m01));
 		m01 = 7; u_ps_1	= ps_opt_var(((ps_N + 1)*(m01 - 1) + 1):((ps_N + 1)*m01));
 		m01 = 8; u_ps_2	= ps_opt_var(((ps_N + 1)*(m01 - 1) + 1):((ps_N + 1)*m01));
 		
+        cost =  V.*sqrt(u_ps_1.^2 + u_ps_2.^2)
 % % % 		INCOMPLETE
 	end
 
@@ -219,7 +220,9 @@ results_1hop.tf_ps	= ps_opt_tf;
 	function [c_inequality, c_equality] = calc_constraints_1hop(ps_opt_var)
 		% define some things
         Fmax = 415;
+        Emax = 400;
         m =3;
+        g = 9.81;
         S = .0283;
         Cd = .05;
         
@@ -236,9 +239,9 @@ results_1hop.tf_ps	= ps_opt_tf;
 
 		tf_ps	= ps_opt_var((ps_N + 1)*9 + 1);
        
-		us76	= std_atmosphere(-x_ps_3 * quadrotor_model_parameters.scale_posn);
+		us76	= std_atmosphere(-x_ps_3 * quadrotor_model_parameters.scale_posn)
 		
-        D = 0.5*us76.rho*x_ps_4^2*S*Cd;
+        D = 0.5*us76.rho'*x_ps_4.^2*S*Cd;
         
 		A1	= 2*ps_D*x_ps_1(1:(ps_N+1)) / tf_ps - ...
 			( x_ps_4.*cos(x_ps_5).*cos(x_ps_6)  ); %% EXAMPLE
@@ -250,29 +253,30 @@ results_1hop.tf_ps	= ps_opt_tf;
 			( x_ps_2.*sin(x_ps_5).*cos(x_ps_6)  ); 
         
 		A3	= 2*ps_D*x_ps_3(1:(ps_N+1)) / tf_ps - ...
-			( -x_ps_4*sin(x_ps_6) ) ; 
+			( -x_ps_4'*sin(x_ps_6) ) ; 
         
         A4	= 2*ps_D*x_ps_4(1:(ps_N+1)) / tf_ps - ...
 			( u_ps_2 - D - m*g*sin(x_ps_6))/m ;
         
         A5	= 2*ps_D*x_ps_5(1:(ps_N+1)) / tf_ps - ...
-			( u_ps_2*sin(u_ps_3)*inv( m*x_ps_4*cos(x_ps_6) )   ) ;
+			( u_ps_2'*sin(u_ps_3)*inv( m*x_ps_4'*cos(x_ps_6) )   ) ;
+        
         
         A6	= 2*ps_D*x_ps_6(1:(ps_N+1)) / tf_ps - ...
-			  ( u_ps_2 *cos(u_ps_3) - m*g*cos(x_ps_6) )*inv(m*x_ps_4);
+			  ( (u_ps_2).*cos(u_ps_3) - m*g*cos(x_ps_6) )./x_ps_4;
           
 		
 % % % % 		INCOMPLETE
 		c1 = -x_ps_4;
         c2 = x_ps_4 - 50;
-        c3 = -1000 - x_ps_3;
+        c3 = 1000 - x_ps_3;
         c4 =  x_ps_3;
-        c5 = -deg2rad(10) + x_ps_5;
-        c6 = -x_ps_6 - deg2rad(10);
-        c7 = -u_ps_3 - deg2rad(30);
-        c8 =  -deg2rad(30) + u_ps_3;
-        c9 = sqrt( u_ps_1^2 + u_ps_1^2) - Fmax; 
-        c10 = u1 - Emax; 
+        c5 = deg2rad(10) + x_ps_5;
+        c6 = x_ps_6 - deg2rad(10);
+        c7 = u_ps_3 - deg2rad(30);
+        c8 =  deg2rad(30) + u_ps_3;
+        c9 = sqrt( u_ps_1.^2 + u_ps_1.^2) - Fmax; 
+        c10 = u_ps_1 - Emax; 
 		
 		c_inequality= [c1;c2;c3;c4;c5;c5;c7;c8;c9;c10];		%=== INCOMPLETE
 		c_equality	= [A1;A2;A3;A4;A5;A6];		%==== INCOMPLETE
