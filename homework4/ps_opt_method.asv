@@ -200,7 +200,7 @@ results_1hop.tf_ps	= ps_opt_tf;
 		m01 = 8; u_ps_2	= ps_opt_var(((ps_N + 1)*(m01 - 1) + 1):((ps_N + 1)*m01));
 % 		m01 = 9; u_ps_3	= ps_opt_var(((ps_N + 1)*(m01 - 1) + 1):((ps_N + 1)*m01));
 		
-		tf_ps	= ps_opt_var((ps_N + 1)*9 + 1);
+		tf_ps	= ps_opt_var((ps_N + 1)*9 + 1)
         
         cost = 0.01*tf_ps + 0.5*tf_ps*calc_energy_1hop(ps_opt_var)'*w_ps;
 % % % 		INCOMPLETE
@@ -273,10 +273,10 @@ results_1hop.tf_ps	= ps_opt_tf;
         c7 = -deg2rad(30) - u_ps_3 ;
         c8 =  u_ps_3-deg2rad(30);
         c9 = sqrt( u_ps_1.^2 + u_ps_2.^2) - Fmax; 
-        c10 = u_ps_1 - Emax;
-        c11 = .01 - tf_ps; 
+        c10 = u_ps_1 - Emax
+        c11 = .01tf_ps; 
 		
-		c_inequality= [c1;c2;c3;c4;c5;c6;c7;c8;c9;c10;c11];	%=== INCOMPLETE
+		c_inequality= [c1;c2;c3;c4;c5;c6;c7;c8;c9;c10];	%=== INCOMPLETE
 		c_equality	= [A1;A2;A3;A4;A5;A6]	;	%==== INCOMPLETE
 		
 		if any(~isreal(c_equality)) || any(~isreal(c_inequality))
