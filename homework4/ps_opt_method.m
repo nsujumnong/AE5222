@@ -15,7 +15,7 @@ initial_state			= initial_dyn_state;
 initial_state.position	= from_coordinates;
 
 final_state.position	= to_location;
-final_state.altitude	= -100;			% m
+final_state.altitude	= 100;			% m
 final_state.airspeed	= 0;			% m/s
 final_state.ang_climb	= 0;			% rad
 
@@ -82,14 +82,14 @@ end
 % DESIRED INITIAL GUESS
 x_1_ps0 = linspace(0,2000,16);
 x_2_ps0 = linspace(0,50,16);
-x_3_ps0 = linspace(100,100,16);
-x_4_ps0 = linspace(10,50,16);
-x_5_ps0 = linspace(0,0,16);
-x_6_ps0 = linspace(0,0,16);
-u_1_ps0 = linspace(30,30,16);
-u_2_ps0 = linspace(0,0,16);
-u_3_ps0 = linspace(0,0,16);
-init_gs_tf = 1;
+x_3_ps0 = linspace(-100,xif(3),16);
+x_4_ps0 = linspace(10,xif(4),16);
+x_5_ps0 = linspace(xi0(5),xif(5),16);
+x_6_ps0 = linspace(xi0(6),xif(6),16);
+u_1_ps0 = linspace(rand()*10,rand()*10,16);
+u_2_ps0 = linspace(40,40,16);
+u_3_ps0 = linspace(-0.5236,0.5236,16);
+init_gs_tf = 300;
 ps_opt_var0 = [x_1_ps0'; x_2_ps0'; x_3_ps0';...
 	x_4_ps0'; x_5_ps0'; x_6_ps0'; u_1_ps0'; u_2_ps0'; u_3_ps0'; init_gs_tf'];
 
@@ -104,18 +104,16 @@ n_max_fun_evals = 1e6;
 n_max_iter      = 1e4;
 
 %----- State and input bounds
-lower_bounds	= -inf*ones( 9*(ps_N + 1) + 1, 1)	%=== INCOMPLETE
-
 
 x_lower = -inf(ps_N+1,1);
 y_lower = -inf(ps_N+1,1);
 z_lower = -1000*ones(ps_N+1,1);
 v_lower= 2*ones(ps_N+1,1);
-gamma_lower= deg2rad(-10)*ones(ps_N+1,1);
+gamma_lower= -deg2rad(10)*ones(ps_N+1,1);
 psi_lower = -2*pi*ones(ps_N+1,1);
 T_lower = -400*ones(ps_N+1,1);
 L_lower = -400*ones(ps_N+1,1);
-phi_lower =  deg2rad(-30)*ones(ps_N+1,1);
+phi_lower =  -deg2rad(30)*ones(ps_N+1,1);
 
 lower_bounds = [x_lower;...
                 y_lower;...
@@ -127,10 +125,10 @@ lower_bounds = [x_lower;...
                 L_lower;...
                 phi_lower;
                 0];	%=== INCOMPLETE
-size(lower_bounds)
 
-x_upper = inf(ps_N+1,1);
-y_upper = inf(ps_N+1,1);
+
+x_upper = inf*ones(ps_N+1,1);
+y_upper = inf*ones(ps_N+1,1);
 z_upper = zeros(ps_N+1,1);
 v_upper = 50*ones(ps_N+1,1);
 gamma_upper= deg2rad(10)*ones(ps_N+1,1);
@@ -164,35 +162,35 @@ solver_options	= optimoptions('fmincon', 'Display','final', 'Algorithm','sqp',..
 % 	'MaxIter',n_max_iter, 'MaxFunEvals',n_max_fun_evals, ...
 % 	'TolCon',constraint_tol, 'TolX', step_tol);
 
-A = zeros(6,9*(ps_N+1)+1);
-b = zeros([6 1]);
-A(1,1) = 1
-A(2, (ps_N +1)+1) = 1;
-A(3, (ps_N +1)*2+1) = 1;
-A(4, (ps_N +1)-1) = 1;
-A(5, (ps_N +1)*2-1) = 1;
-A(6, (ps_N +1)*3-1) = 1;
-b(1:3) = xi0(1:3);
-b(4:6) = xif(4:6);
+% A = zeros(6,9*(ps_N+1)+1);
+% b = zeros([6 1]);
+% A(1,1) = 1
+% A(2, (ps_N +1)+1) = 1;
+% A(3, (ps_N +1)*2+1) = 1;
+% A(4, (ps_N +1)-1) = 1;
+% A(5, (ps_N +1)*2-1) = 1;
+% A(6, (ps_N +1)*3-1) = 1;
+% b(1:3) = xi0(1:3);
+% b(4:6) = xif(4:6);
 
 [ps_opt_var_calc, ~, exit_flag, ~] = ...
 	fmincon( @calc_cost_1hop, ps_opt_var0, [], [], [], [], ...
 	lower_bounds, upper_bounds, @calc_constraints_1hop, solver_options);
-
+exit_flag
 if any( exit_flag == [0 -1 -2 -3] )
 	[tmp1, tmp2] = calc_constraints_1hop(ps_opt_var_calc);
-    size(ps_opt_var_calc)
-    size(upper_bounds)
+    size(ps_opt_var_calc);
+    size(upper_bounds);
 	tmp3 = ps_opt_var_calc <= upper_bounds + constraint_tol;
 	tmp4 = ps_opt_var_calc >= lower_bounds - constraint_tol;
-	fprintf('Parameters \n')
+	fprintf('Parameters \n');
 	reshape(ps_opt_var_calc(1:end-1), ps_N + 1, 9)
 	
 	fprintf('Upper bounds \n')
 	reshape(tmp3(1:end-1), ps_N + 1, 9)
-	tmp3(end)
+	tmp3(end);
 	
-	fprintf('Lower bounds \n')
+	fprintf('Lower bounds \n');
 	reshape(tmp4(1:end-1), ps_N + 1, 9)
 	tmp4(end)
 	
@@ -203,6 +201,7 @@ if any( exit_flag == [0 -1 -2 -3] )
 	reshape(tmp2(1:6*(ps_N + 1)), ps_N + 1, 6)
 	(tmp2(6*(ps_N + 1) + 1:end))'
 		
+    exit_flag
 	error('Fatal error in trajectory generator');	
 end
 
@@ -239,9 +238,12 @@ end
  disp(ps_N + 1)
  
 ps_opt_xiu	= reshape( ps_opt_var_calc(1: end-1), [ps_N + 1, 9] );
-xi_ps = ps_opt_xiu(1:6);
-u_ps = ps_opt_xiu(7:end);
+xi_ps = ps_opt_xiu(:,1:6);
+u_ps = ps_opt_xiu(:,7:end);
 ps_opt_tf	= ps_opt_var_calc(end);
+
+
+plot3(xi_ps(:,1),xi_ps(:,2),xi_ps(:,3)) 
 
 %% Scale results to usual time
 
@@ -327,16 +329,22 @@ results_1hop.tf_ps	= ps_opt_tf;
         
         A6	= ps_D*x_ps_6(1:(ps_N+1)) - ...
 			  (tf_ps/2)*( (u_ps_2).*cos(u_ps_3) - m*g*cos(x_ps_6) )./(m*x_ps_4);
+        
+         A7  = 2000 - x_ps_1(end);
+         A8  = 50 - x_ps_2(end);
+         A9  = x_ps_1(1);
+         A10 = x_ps_2(1);
+         A11 = x_ps_3(1) + 100;
+         A12 = x_ps_4(1) - 10;
          
-		
 % % % % 		INCOMPLETE
 		
         c1 = sqrt(u_ps_1.^2+u_ps_2.^2)-400;
         c2 = calc_energy_1hop(ps_opt_var) - 415*1000; 
-        
+         
 		
 		c_inequality= [c1;c2];	%=== INCOMPLETE
-		c_equality	= [A1;A2;A3;A4;A5;A6]	;	%==== INCOMPLETE
+		c_equality	= [A1;A2;A3;A4;A5;A6;A7;A8;A9;A10;A11;A12]	;	%==== INCOMPLETE
 		
 		if any(~isreal(c_equality)) || any(~isreal(c_inequality))
 			error('Complex constraints; something terrible happened.');
