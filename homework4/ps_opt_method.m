@@ -15,7 +15,7 @@ initial_state			= initial_dyn_state;
 initial_state.position	= from_coordinates;
 
 final_state.position	= to_location;
-final_state.altitude	= 100;			% m
+final_state.altitude	= -100;			% m
 final_state.airspeed	= 0;			% m/s
 final_state.ang_climb	= 0;			% rad
 
@@ -86,9 +86,9 @@ x_3_ps0 = linspace(-100,xif(3),16);
 x_4_ps0 = linspace(10,xif(4),16);
 x_5_ps0 = linspace(xi0(5),xif(5),16);
 x_6_ps0 = linspace(xi0(6),xif(6),16);
-u_1_ps0 = linspace(rand()*10,rand()*10,16);
+u_1_ps0 = linspace(40,40,16);
 u_2_ps0 = linspace(40,40,16);
-u_3_ps0 = linspace(-0.5236,0.5236,16);
+u_3_ps0 = linspace(.034,.453,16)
 init_gs_tf = 300;
 ps_opt_var0 = [x_1_ps0'; x_2_ps0'; x_3_ps0';...
 	x_4_ps0'; x_5_ps0'; x_6_ps0'; u_1_ps0'; u_2_ps0'; u_3_ps0'; init_gs_tf'];
@@ -105,10 +105,10 @@ n_max_iter      = 1e4;
 
 %----- State and input bounds
 
-x_lower = -inf(ps_N+1,1);
-y_lower = -inf(ps_N+1,1);
+x_lower = zeros(ps_N+1,1);
+y_lower = zeros(ps_N+1,1);
 z_lower = -1000*ones(ps_N+1,1);
-v_lower= 2*ones(ps_N+1,1);
+v_lower= .01*ones(ps_N+1,1);
 gamma_lower= -deg2rad(10)*ones(ps_N+1,1);
 psi_lower = -2*pi*ones(ps_N+1,1);
 T_lower = -400*ones(ps_N+1,1);
@@ -127,8 +127,8 @@ lower_bounds = [x_lower;...
                 0];	%=== INCOMPLETE
 
 
-x_upper = inf*ones(ps_N+1,1);
-y_upper = inf*ones(ps_N+1,1);
+x_upper = 2000*ones(ps_N+1,1);
+y_upper = 50*ones(ps_N+1,1);
 z_upper = zeros(ps_N+1,1);
 v_upper = 50*ones(ps_N+1,1);
 gamma_upper= deg2rad(10)*ones(ps_N+1,1);
@@ -202,7 +202,7 @@ if any( exit_flag == [0 -1 -2 -3] )
 	(tmp2(6*(ps_N + 1) + 1:end))'
 		
     exit_flag
-	error('Fatal error in trajectory generator');	
+	%error('Fatal error in trajectory generator');	
 end
 
 try_again = any(exit_flag == [2 3 4 5]);
@@ -228,7 +228,7 @@ while try_again && (n_attempts <= 7)
 end
 
 if any( exit_flag == [0 -1 -2 -3] )
-	error('Fatal error in trajectory generator');
+%	error('Fatal error in trajectory generator');
 end
 
 %% Results
@@ -280,8 +280,8 @@ results_1hop.tf_ps	= ps_opt_tf;
 		m01 = 4; V	= ps_opt_var(((ps_N + 1)*(m01 - 1) + 1):((ps_N + 1)*m01));
 		m01 = 7; u_ps_1	= ps_opt_var(((ps_N + 1)*(m01 - 1) + 1):((ps_N + 1)*m01));
 		m01 = 8; u_ps_2	= ps_opt_var(((ps_N + 1)*(m01 - 1) + 1):((ps_N + 1)*m01));
-		
-        cost =  V.*sqrt(u_ps_1.^2 + u_ps_2.^2);
+		tf_ps	= ps_opt_var((ps_N + 1)*9 + 1);
+        cost =  V.*sqrt( (u_ps_1*.5*tf_ps).^2 + (u_ps_2*.5*tf_ps).^2);
 % % % 		INCOMPLETE
 	end
 
@@ -310,7 +310,7 @@ results_1hop.tf_ps	= ps_opt_tf;
        %
 		us76	= std_atmosphere(-x_ps_3 );
         
-        D = 0.5*us76.rho'*x_ps_4.^2*S*Cd;
+        D = 0.5*us76.rho'*(x_ps_4/tf_ps).^2*S*Cd;
         
 		A1	= ps_D*x_ps_1(1:(ps_N+1))  - ...
 			(tf_ps/2)*( x_ps_4.*cos(x_ps_5).*cos(x_ps_6)  ); %% EXAMPLE
@@ -336,6 +336,9 @@ results_1hop.tf_ps	= ps_opt_tf;
          A10 = x_ps_2(1);
          A11 = x_ps_3(1) + 100;
          A12 = x_ps_4(1) - 10;
+         
+         
+         
          
 % % % % 		INCOMPLETE
 		
