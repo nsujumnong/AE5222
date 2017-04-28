@@ -15,7 +15,7 @@ initial_state			= initial_dyn_state;
 initial_state.position	= from_coordinates;
 
 final_state.position	= to_location;
-final_state.altitude	= 100;			% m
+final_state.altitude	= -100;			% m
 final_state.airspeed	= 0;			% m/s
 final_state.ang_climb	= 0;			% rad
 
@@ -45,7 +45,7 @@ xi0 = [ 0;...
        
      
 xif = [ 1;...
-        1;...
+        0;...
         -final_state.altitude / SCALE;...
         final_state.altitude / SCALE; ... ...
         0;...
@@ -61,7 +61,7 @@ x_5_ps0 = linspace(xi0(5),xif(5),16);
 x_6_ps0 = linspace(xi0(6),xif(6),16);
 u_1_ps0 =  zeros( 1,ps_N+1);
 u_2_ps0 = (3 * 9.81) / SCALE * ones(1,16);   
-u_3_ps0 = zeros(1,ps_N+1);  
+u_3_ps0 = .29*ones(1,ps_N+1);  
 init_gs_tf = 300;
 ps_opt_var0 = [x_1_ps0'; x_2_ps0'; x_3_ps0';...
                 x_4_ps0'; x_5_ps0'; x_6_ps0'; u_1_ps0'; u_2_ps0'; u_3_ps0'; init_gs_tf'];
