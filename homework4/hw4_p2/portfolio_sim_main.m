@@ -58,21 +58,21 @@ net_worth		= zeros(30, 1);
 asset_returns	= zeros(30, asset_data.n_assets);
 for m1 = 1:30
 	[net_worth_k, asset_returns_k, portfolio_k] = ...
-		returns_of_the_year(net_worth_k, @investment_policy_test, asset_data);
+		returns_of_the_year(net_worth_k, @sample_investment_policy_1, asset_data);
 	asset_returns(m1, :)= asset_returns_k;
 	net_worth(m1)		= net_worth_k;
 	portfolio(m1, :)	= portfolio_k;
 end
-%{
+
 fprintf('\n =================================== \n  Final net worth: $ %4.2f M.', net_worth_k)
 fprintf('\n  Final net worth adjusted for inflation of 1: $%4.2f M \n', net_worth_k/ (1.02^30) );
 fprintf('\n =================================== \n\n');
-%}
+
 
 % fprintf('Asset return rates (percentage points).\n')
 % disp( (asset_returns - 1).*100)
 
-%{
+
 figure;
 for m1 = 1:asset_data.n_assets
 	plot(1:30, (asset_returns(:, m1) - 1)*100); hold on; grid on;
@@ -84,4 +84,3 @@ for m1 = 1:asset_data.n_assets + 1
 	plot(1:30, portfolio(:, m1)); hold on; grid on;
 end
 plot(1:30, net_worth, 'LineWidth', 3)
-%}

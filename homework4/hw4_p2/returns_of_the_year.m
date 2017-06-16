@@ -41,7 +41,7 @@ Emulation of an investment portfolio: calculate annual returns.
 %}
 
 function [net_worth_next, asset_rates_of_return, portfolio] = ...
-	returns_of_the_year(net_worth_current, investment_policy, asset_data)
+	returns_of_the_year(net_worth_current,  investment_policy, asset_data)
 
 investments = investment_policy(net_worth_current, asset_data);
 %%

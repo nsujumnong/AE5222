@@ -80,15 +80,15 @@ end
 
 
 % DESIRED INITIAL GUESS
-x_1_ps0 = linspace(xi0(1),xif(1),16);
-x_2_ps0 = linspace(xi0(2),xif(2),16);
-x_3_ps0 = linspace(xi0(3),xif(3),16);
-x_4_ps0 = linspace(xi0(4),xif(4),16);
+x_1_ps0 = linspace(0,2000,16);
+x_2_ps0 = linspace(0,50,16);
+x_3_ps0 = linspace(-100,xif(3),16);
+x_4_ps0 = linspace(10,xif(4),16);
 x_5_ps0 = linspace(xi0(5),xif(5),16);
 x_6_ps0 = linspace(xi0(6),xif(6),16);
-u_1_ps0 = linspace(30,30,16);
-u_2_ps0 = linspace(30,30,16);
-u_3_ps0 = linspace(.5,0.03,16)
+u_1_ps0 = linspace(40,40,16);
+u_2_ps0 = linspace(40,40,16);
+u_3_ps0 = linspace(.034,.453,16)
 init_gs_tf = 300;
 ps_opt_var0 = [x_1_ps0'; x_2_ps0'; x_3_ps0';...
 	x_4_ps0'; x_5_ps0'; x_6_ps0'; u_1_ps0'; u_2_ps0'; u_3_ps0'; init_gs_tf'];
@@ -108,7 +108,7 @@ n_max_iter      = 1e4;
 x_lower = zeros(ps_N+1,1);
 y_lower = zeros(ps_N+1,1);
 z_lower = -1000*ones(ps_N+1,1);
-v_lower= .0001*ones(ps_N+1,1);
+v_lower= .01*ones(ps_N+1,1);
 gamma_lower= -deg2rad(10)*ones(ps_N+1,1);
 psi_lower = -2*pi*ones(ps_N+1,1);
 T_lower = -400*ones(ps_N+1,1);
@@ -156,6 +156,22 @@ solver_options	= optimoptions('fmincon', 'Display','final', 'Algorithm','sqp',..
 	'MaxIter',n_max_iter, 'MaxFunEvals',n_max_fun_evals, ...
 	'OptimalityTolerance', optim_tol, 'TolCon',constraint_tol, 'TolX', step_tol);
 
+%----- MATLAB R2016a or lower
+% solver_options	= optimoptions('fmincon', 'Display','iter', 'Algorithm','sqp',...
+% 	'GradObj',use_f_gradient, 'GradObj',use_c_gradient, ...
+% 	'MaxIter',n_max_iter, 'MaxFunEvals',n_max_fun_evals, ...
+% 	'TolCon',constraint_tol, 'TolX', step_tol);
+
+% A = zeros(6,9*(ps_N+1)+1);
+% b = zeros([6 1]);
+% A(1,1) = 1
+% A(2, (ps_N +1)+1) = 1;
+% A(3, (ps_N +1)*2+1) = 1;
+% A(4, (ps_N +1)-1) = 1;
+% A(5, (ps_N +1)*2-1) = 1;
+% A(6, (ps_N +1)*3-1) = 1;
+% b(1:3) = xi0(1:3);
+% b(4:6) = xif(4:6);
 
 [ps_opt_var_calc, ~, exit_flag, ~] = ...
 	fmincon( @calc_cost_1hop, ps_opt_var0, [], [], [], [], ...
@@ -265,7 +281,7 @@ results_1hop.tf_ps	= ps_opt_tf;
 		m01 = 7; u_ps_1	= ps_opt_var(((ps_N + 1)*(m01 - 1) + 1):((ps_N + 1)*m01));
 		m01 = 8; u_ps_2	= ps_opt_var(((ps_N + 1)*(m01 - 1) + 1):((ps_N + 1)*m01));
 		tf_ps	= ps_opt_var((ps_N + 1)*9 + 1);
-        cost =  V.*sqrt( (u_ps_1).^2 + (u_ps_2).^2);
+        cost =  V.*sqrt( (u_ps_1*.5*tf_ps).^2 + (u_ps_2*.5*tf_ps).^2);
 % % % 		INCOMPLETE
 	end
 
@@ -273,7 +289,7 @@ results_1hop.tf_ps	= ps_opt_tf;
 	function [c_inequality, c_equality] = calc_constraints_1hop(ps_opt_var)
 		% define some things
         Fmax = 400;
-        Emax = 415*10000;
+        Emax = 415;
         m = 3;
         g = 9.81;
         S = .283;
@@ -314,16 +330,20 @@ results_1hop.tf_ps	= ps_opt_tf;
         A6	= ps_D*x_ps_6(1:(ps_N+1)) - ...
 			  (tf_ps/2)*( (u_ps_2).*cos(u_ps_3) - m*g*cos(x_ps_6) )./(m*x_ps_4);
         
-         A7  = xif(1) - x_ps_1(end);
-         A8  = xif(2) - x_ps_2(end);
+         A7  = 2000 - x_ps_1(end);
+         A8  = 50 - x_ps_2(end);
          A9  = x_ps_1(1);
          A10 = x_ps_2(1);
          A11 = x_ps_3(1) + 100;
          A12 = x_ps_4(1) - 10;
          
+         
+         
+         
+% % % % 		INCOMPLETE
 		
-        c1 = sqrt(u_ps_1.^2+u_ps_2.^2)-Fmax;
-        c2 = calc_energy_1hop(ps_opt_var) - Emax; 
+        c1 = sqrt(u_ps_1.^2+u_ps_2.^2)-400;
+        c2 = calc_energy_1hop(ps_opt_var) - 415*1000; 
          
 		
 		c_inequality= [c1;c2];	%=== INCOMPLETE

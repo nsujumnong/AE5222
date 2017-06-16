@@ -24,6 +24,6 @@ sys2 = kalman(sysKalman ,V,W,[]);
 F = lqgreg(sysKalman,K);
  
 clsys = feedback(sys,F,+1);
-step(clsys,'b-',10)
+step(sysKalman,'r--',clsys,'b-',10)
 
 

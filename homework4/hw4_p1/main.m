@@ -52,7 +52,7 @@ L = u(:, 2);
 phi = u(:, 3);
 
 figure
-plot(time, data)
+plot(time, x)
 grid on
 
 figure
@@ -71,12 +71,16 @@ plot(time, -z)
 title('Z path')
 
 figure
+plot(time, y)
+title('Y path')
+
+figure
 plot(time, v)
 grid on
 title('Velocity')
 
 figure
-plot3(data, y, z)
+plot3(x, y, z)
 grid on
 title('3D path')
 
